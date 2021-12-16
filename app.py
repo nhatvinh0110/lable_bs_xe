@@ -35,7 +35,9 @@ def mainpage(page=None):
         update_detects(detects_pos)
         resp = Response("saved")
         return resp
-
+@app.route("/home/")
+def home():
+    return render_template('home.html')
 
 def create_connection(db_file):
     conn = None

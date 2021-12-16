@@ -1,5 +1,5 @@
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-  integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+  integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"> -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
@@ -7,13 +7,6 @@
 <head>
   <title>Gán nhãn biển số xe</title>
 </head>
-<!-- <style>
-  .container {
-    padding: 0rem 0rem;
-    margin-left: 10px;
-
-  } -->
-</style>
 <script>
   var images = [];
   var canvass = [];
@@ -108,15 +101,27 @@
 </script>
 
 <body style="background-color: burlywood;">
-  <div class="container">
-    {%for img in imgs%}
-    <div class="row" style="border: groove;">
-      <div class="col-sm-8"
-        style="  display: flex;justify-content: center;align-items: center;background-color:black; width: 600;height: 450;overflow: auto;">
-        <canvas id="canvas{{img[0]}}" style="border:1px solid #000000;width: auto;height: auto;"></canvas>
+  <nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#">Label Tool</a>
       </div>
-      <div class="col-sm-4" style="background-color: cadetblue;">
-        <div class="form-horizontal" style="font-size: 14px;font-weight: 600;margin: auto;">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#">Home</a></li>
+        <li><a href="/">Detect</a></li>
+        <li><a href="/">ORC</a></li>
+      </ul>
+    </div>
+  </nav>
+  <div class="container" style="width: 100%;">
+    {%for img in imgs%}
+    <div class="row" style="border: groove;width: 95%;margin: auto;">
+      <div class="col-md-8"
+        style="  display: flex;justify-content: center;align-items: center;background-color:black; width: 70%;height: 500px;overflow: auto;">
+        <canvas id="canvas{{img[0]}}" style="border:1px solid #000000;width: auto;height: auto; margin: auto;"></canvas>
+      </div>
+      <div class="col-md-4" style="background-color: cadetblue;width: 30%;height: 500px;margin: auto;">
+        <div class="form-horizontal" style="font-size: 14px;font-weight: 600;margin: auto;padding-top: 50px;">
           <div class="form-group">
             <p class="control-label col-sm-3">ID:</label>
             <div class="col-sm-8">
