@@ -8,16 +8,20 @@
   <title>Gán nhãn biển số xe</title>
 </head>
 <script>
+
   var images = [];
   var canvass = [];
   var contexts = [];
   var points = new Array();
   var detects = new Array();
+
+
   function fillColor(color, context) {
     context.fillStyle = color;
     context.strokeStyle = color;
     currentColor = color;
   }
+
   function drawLine(x1, y1, x2, y2, context) {
     fillColor('red', context)
     context.beginPath();
@@ -26,6 +30,7 @@
     context.closePath();
     context.stroke();
   }
+
   function drawPoint(x, y, context) {
     fillColor('blue', context);
     context.beginPath();
@@ -93,8 +98,20 @@
     var check_box = document.getElementById("checkbox" + id);
     if (!check_box.checked) {
       document.getElementById("list_point" + id).innerHTML = "";
+      document.getElementById('checkboxF' + id).checked = true;
       points[id].length = 0;
       refresh(id);
+    }else{
+      document.getElementById('checkboxF' + id).checked = false;
+    }
+
+  }
+  function update_checkboxF(id) {
+    var check_box = document.getElementById("checkboxF" + id);
+    if (!check_box.checked) {
+      document.getElementById('checkbox' + id).checked = true;
+    }else{
+      document.getElementById('checkbox' + id).checked = false;
     }
 
   }
@@ -104,11 +121,11 @@
   <nav class="navbar navbar-inverse">
     <div class="container-fluid">
       <div class="navbar-header">
-        <a class="navbar-brand" href="#">Label Tool</a>
+        <a class="navbar-brand" href="#">Gán nhãn biển số xe</a>
       </div>
       <ul class="nav navbar-nav">
-        <li class="active"><a href="#">Home</a></li>
-        <li><a href="/">Detect</a></li>
+        <li ><a href="#">Trang chủ</a></li>
+        <liclass="active"><a href="/">Detect</a></li>
         <li><a href="/">ORC</a></li>
       </ul>
     </div>
@@ -129,7 +146,7 @@
             </div>
           </div>
           <div class="form-group">
-            <p class="control-label col-sm-3">Name:</p>
+            <p class="control-label col-sm-3">Ảnh:</p>
             <div class="col-sm-8">
               <input type="text" readonly class="form-control" id="path{{img[0]}}" value="{{img[2]}}">
             </div>
@@ -150,15 +167,28 @@
                 {% endif %}
                 <option value="loaikhac">Loại khác</option>
               </select> -->
-              {% if img[1] == 'oto' %}
+              <select id="type{{img[0]}}" class="form-control">
+                {% if img[1] == 'oto' %}
+                <option selected="selected" value="oto">Ô tô</option>
+                {% else %}
+                <option value="oto">Ô tô</option>
+                {% endif %}
+                {% if img[1] == 'moto' %}
+                <option selected="selected" value="moto">Xe máy</option>
+                {% else %}
+                <option value="moto">Xe máy</option>
+                {% endif %}
+                <option value="other">Loại khác</option>
+              </select>
+              <!-- {% if img[1] == 'oto' %}
               <input type="text" readonly class="form-control" id="path{{img[0]}}" value="Ô tô">
               {% else %}
               <input type="text" readonly class="form-control" id="path{{img[0]}}" value="Xe máy">
-              {% endif %}
+              {% endif %} -->
             </div>
           </div>
           <div class="form-group">
-            <p class="control-label col-sm-3">Points</p>
+            <p class="control-label col-sm-3">Các điểm</p>
             <div class="col-sm-8">
               <textarea class="form-control" rows="4" id="list_point{{img[0]}}"></textarea>
             </div>
@@ -177,7 +207,12 @@
                   <input id="checkbox{{img[0]}}" type="checkbox" checked onclick="update_checkbox('{{img[0]}}')">
                   {% else %}
                   <input id="checkbox{{img[0]}}" type="checkbox" onclick="update_checkbox('{{img[0]}}')">
-                  {% endif %} Có biển số </label>
+                  {% endif %} Có </label>
+                <label> {% if img[11] == 'null' %}
+                  <input id="checkboxF{{img[0]}}" type="checkbox" checked onclick="update_checkboxF('{{img[0]}}')">
+                  {% else %}
+                  <input id="checkboxF{{img[0]}}" type="checkbox" onclick="update_checkboxF('{{img[0]}}')">
+                  {% endif %} Không biển số </label>
               </div>
             </div>
           </div>
@@ -205,11 +240,12 @@
         points['{{ img[0] }}'][6] = '{{img[9]}}';
         points['{{ img[0] }}'][7] = '{{img[10]}}';
       }
-      if ('{{img[1]}}' == 'oto') {
-        images['{{ img[0] }}'].src = "{{url_for('static',filename = 'vehicle/car/'+ img[2]+'')}}";
-      } else {
-        images['{{ img[0] }}'].src = "{{url_for('static',filename = 'vehicle/moto/'+ img[2]+'')}}";
-      }
+      // if ('{{img[1]}}' == 'oto') {
+      //   images['{{ img[0] }}'].src = "{{url_for('static',filename = 'vehicle/car/'+ img[2]+'')}}";
+      // } else {
+      //   images['{{ img[0] }}'].src = "{{url_for('static',filename = 'vehicle/moto/'+ img[2]+'')}}";
+      // }
+      images['{{ img[0] }}'].src = "{{url_for('static',filename = img[2])}}";
       canvass['{{ img[0] }}'] = document.getElementById('canvas{{img[0]}}');
 
       contexts['{{ img[0] }}'] = canvass['{{ img[0] }}'].getContext('2d');
@@ -261,15 +297,20 @@
       <button class="btn btn-primary mb-2" onclick="saveAll('last')">Trang cuối</button>
 
     </div>
+    <button class="btn btn-primary mb-2" onclick="saveAll('')">Lưu</button>
   </div>
 </body>
 <footer style="height: 100px; background-color: burlywood;">
 
 </footer>
 <script>
+  var last_index;
+  var kt_anh_raw = 0;
   function saveAll(then) {
     console.log(JSON.stringify(points));
+    kt_anh_raw = 0;
     detects.forEach(item => {
+      //gan cac dinh cua lable
       if (points[item[0]].length >= 8) {
         for (let index = 3; index <= 10; index++) {
           item[index] = points[item[0]][index - 3];
@@ -277,14 +318,31 @@
         item[11] = 'completed';
       } else {
         if (document.getElementById('checkbox' + item[0]).checked == true) {
-          item[11] = 'raw'
+          //kiem tra va gan trang thai
+          item[11] = 'raw';
+          kt_anh_raw  = kt_anh_raw + 1;
         } else {
           item[11] = 'null';
         }
       }
+      // gan lai loai xe
+      var select = document.getElementById('type' + item[0]);
+      var value_type = select.options[select.selectedIndex].value;
+      //console.log(value);
+      if (value_type == 'oto') {
+        item[1] = 'oto';
+      } else if (value_type == 'moto') {
+        item[1] = 'moto';
+      } else {
+        item[1] = 'other';
+      }
+
       last_index = item[0];
-      console.log(last_index);
-    });
+    })
+    if(kt_anh_raw > 0 ){
+      alert('còn ' + kt_anh_raw + ' ảnh chưa gán nhãn!');
+      return;
+    }
     // $.ajax({
     //   type: "POST",
     //   url: "/",
@@ -293,8 +351,6 @@
     //   success: alert("messagesent!")
     // });
     const filteredDetects = detects.filter(item => item !== null)
-
-
     var cur_page;
     if (parseInt('{{cur_page}}') > 0) {
       cur_page = parseInt('{{cur_page}}');
@@ -309,7 +365,7 @@
       });
     //alert("Đã lưu!");
     if (then == 'next') {
-      if (cur_page == Math.floor(parseInt('{{max_lenght}}') / 10) + 1) {
+      if (cur_page == Math.floor(parseInt('{{max_lenght}}') / 5) + 1) {
         alert("Bạn đang ở trang cuối cùng")
       } else {
         cur_page += 1;
@@ -318,18 +374,20 @@
 
     } else if (then == 'previous') {
       if (cur_page == 1) {
-        alert("Bạn đang ở trang đầu tiên")
+        alert("Bạn đang ở trang đầu tiên");
       } else {
         cur_page -= 1;
         document.location.href = "/" + cur_page.toString();
       }
     } else if (then == 'last') {
-      cur_page = Math.floor(parseInt('{{max_lenght}}') / 10) + 1;
+      cur_page = Math.floor(parseInt('{{max_lenght}}') / 5) + 1;
       document.location.href = "/" + cur_page.toString();
+    } else if (then == 'first') {
+      document.location.href = "/";
     }
     else {
-      document.location.href = "/";
 
+      alert("Lưu thành công!");
     }
   }
 </script>

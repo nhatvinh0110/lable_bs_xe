@@ -27,10 +27,10 @@ if __name__ == '__main__':
     database = "./database.db"
     con = create_connection(database)
     with con:
-        # for img in glob.glob("./vehicle/moto/*.jpg"):
-        #     print(os.path.basename(img))
-        #     Detect = ('moto',os.path.basename(img),'null')
-        #     Detect_id = create_detect(con,Detect)
+        for img in glob.glob("./static/vehicle/car/*.jpg"):
+            print(os.path.basename(img))
+            Detect = ('oto','./vehicle/car/'+os.path.basename(img),'raw')
+            Detect_id = create_detect(con,Detect)
         detects = select_detects(con)
         for detect in detects:
             print(detect[0])

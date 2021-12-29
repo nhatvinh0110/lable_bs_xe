@@ -7,7 +7,7 @@ import sqlite3
 from sqlite3 import Error
 import json
 
-
+imgs_per_page = 5
 app = Flask(__name__)
 
 
@@ -19,16 +19,16 @@ def mainpage(page=None):
         if page:
             if str(page).isdigit():
                 page = int(page)
-                if page*10 < len(detects):
-                    return render_template('index.html', imgs=detects[(page-1)*10:page*10],max_lenght = len(detects),cur_page= page)
+                if page*imgs_per_page < len(detects):
+                    return render_template('index.html', imgs=detects[(page-1)*imgs_per_page:page*imgs_per_page],max_lenght = len(detects),cur_page= page)
                 else:
-                    if page*10 > len(detects)+10 :
-                        return render_template('index.html', imgs=detects[0:10],max_lenght = len(detects),cur_page= page)
-                    return render_template('index.html', imgs=detects[(page-1)*10:],max_lenght = len(detects),cur_page= page)
+                    if page*imgs_per_page > len(detects)+imgs_per_page :
+                        return render_template('index.html', imgs=detects[0:imgs_per_page],max_lenght = len(detects),cur_page= page)
+                    return render_template('index.html', imgs=detects[(page-1)*imgs_per_page:],max_lenght = len(detects),cur_page= page)
             else:
-                return render_template('index.html', imgs=detects[0:10],max_lenght = len(detects),cur_page= page)
+                return render_template('index.html', imgs=detects[0:imgs_per_page],max_lenght = len(detects),cur_page= page)
         else:
-            return render_template('index.html', imgs=detects[0:10],max_lenght = len(detects),cur_page= page)        
+            return render_template('index.html', imgs=detects[0:imgs_per_page],max_lenght = len(detects),cur_page= page)        
     if request.method == 'POST':
         jObject = json.loads(request.form['data'])
         detects_pos = jObject['detects']
