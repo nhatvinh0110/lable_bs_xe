@@ -11,33 +11,38 @@ imgs_per_page = 5
 app = Flask(__name__)
 
 
-@app.route("/")
-@app.route('/<page>', methods=['POST', 'GET'])
-def mainpage(page=None):
+@app.route("/detect/")
+@app.route('/detect/<page>', methods=['POST', 'GET'])
+def detect(page=None):
     detects = select_detects()
     if request.method == 'GET':
         if page:
             if str(page).isdigit():
                 page = int(page)
                 if page*imgs_per_page < len(detects):
-                    return render_template('index.html', imgs=detects[(page-1)*imgs_per_page:page*imgs_per_page],max_lenght = len(detects),cur_page= page)
+                    return render_template('detect.html', imgs=detects[(page-1)*imgs_per_page:page*imgs_per_page],max_lenght = len(detects),cur_page= page)
                 else:
                     if page*imgs_per_page > len(detects)+imgs_per_page :
-                        return render_template('index.html', imgs=detects[0:imgs_per_page],max_lenght = len(detects),cur_page= page)
-                    return render_template('index.html', imgs=detects[(page-1)*imgs_per_page:],max_lenght = len(detects),cur_page= page)
+                        return render_template('detect.html', imgs=detects[0:imgs_per_page],max_lenght = len(detects),cur_page= page)
+                    return render_template('detect.html', imgs=detects[(page-1)*imgs_per_page:],max_lenght = len(detects),cur_page= page)
             else:
-                return render_template('index.html', imgs=detects[0:imgs_per_page],max_lenght = len(detects),cur_page= page)
+                return render_template('detect.html', imgs=detects[0:imgs_per_page],max_lenght = len(detects),cur_page= page)
         else:
-            return render_template('index.html', imgs=detects[0:imgs_per_page],max_lenght = len(detects),cur_page= page)        
+            return render_template('detect.html', imgs=detects[0:imgs_per_page],max_lenght = len(detects),cur_page= page)        
     if request.method == 'POST':
         jObject = json.loads(request.form['data'])
         detects_pos = jObject['detects']
         update_detects(detects_pos)
         resp = Response("saved")
         return resp
-@app.route("/home/")
+@app.route("/")
 def home():
     return render_template('home.html')
+
+@app.route("/orc/")
+@app.route('/orc/<page>', methods=['POST', 'GET'])
+def orc():
+    return render_template('orc.html')
 
 def create_connection(db_file):
     conn = None

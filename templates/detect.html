@@ -1,0 +1,423 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+<head>
+  <title>Gán nhãn biển số xe</title>
+</head>
+<script>
+
+  var images = [];
+  var canvass = [];
+  var contexts = [];
+  var points = new Array();
+  var detects = new Array();
+
+
+  function fillColor(color, context) {
+    context.fillStyle = color;
+    context.strokeStyle = color;
+    currentColor = color;
+  }
+
+  function drawLine(x1, y1, x2, y2, context) {
+    fillColor('red', context)
+    context.beginPath();
+    context.moveTo(x1, y1);
+    context.lineTo(x2, y2);
+    context.closePath();
+    context.stroke();
+  }
+
+  function drawPoint(x, y, context) {
+    fillColor('yellow', context);
+    context.beginPath();
+    context.rect(x, y, 3, 3);
+    context.stroke();
+  }
+
+  function refresh(id) {
+    var context = contexts[id];
+    var canvas = canvass[id];
+    var p = points[id];
+    //in ra 4 point
+    document.getElementById("list_point" + id).innerHTML = "";
+    for (var index = 0; index < p.length; index += 2) {
+      document.getElementById("list_point" + id).innerHTML += " (" + p[index] + ";" + p[index + 1] + ")\n";
+    }
+
+    //clear canvas
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(images[id], 0, 0);
+    if (p.length == 2) {
+      drawPoint(p[0], p[1], context);
+      return;
+    }
+    if (p.length == 4) {
+      drawPoint(p[0], p[1], context);
+      drawPoint(p[2], p[3], context);
+      drawLine(p[0], p[1], p[2], p[3], context);
+      return;
+    }
+    if (p.length == 6) {
+      drawPoint(p[0], p[1], context);
+      drawPoint(p[2], p[3], context);
+      drawPoint(p[4], p[5], context);
+      drawLine(p[0], p[1], p[2], p[3], context);
+      drawLine(p[2], p[3], p[4], p[5], context);
+      return;
+
+    }
+    if (p.length == 8) {
+      drawPoint(p[0], p[1], context);
+      drawPoint(p[2], p[3], context);
+      drawPoint(p[4], p[5], context);
+      drawPoint(p[6], p[7], context);
+      drawLine(p[0], p[1], p[2], p[3], context);
+      drawLine(p[2], p[3], p[4], p[5], context);
+      drawLine(p[4], p[5], p[6], p[7], context);
+      drawLine(p[6], p[7], p[0], p[1], context);
+      return;
+
+    }
+  }
+  function getMousePos(canvas, evt) {
+    var rect = canvas.getBoundingClientRect();
+    return {
+      x: Math.round(evt.clientX - rect.left),
+      y: Math.round(evt.clientY - rect.top)
+    };
+  }
+  function clearCanvas(id) {
+    points[id].length = 0;
+    refresh(id);
+  }
+  function update_checkbox(id) {
+    var check_box = document.getElementById("checkbox" + id);
+    if (!check_box.checked) {
+      document.getElementById("list_point" + id).innerHTML = "";
+      document.getElementById('checkboxF' + id).checked = true;
+      points[id].length = 0;
+      refresh(id);
+    } else {
+      document.getElementById('checkboxF' + id).checked = false;
+    }
+
+  }
+  function update_checkboxF(id) {
+    var check_box = document.getElementById("checkboxF" + id);
+    if (!check_box.checked) {
+      document.getElementById('checkbox' + id).checked = true;
+    } else {
+      document.getElementById("list_point" + id).innerHTML = "";
+      document.getElementById('checkboxF' + id).checked = true;
+      points[id].length = 0;
+      refresh(id);
+      document.getElementById('checkbox' + id).checked = false;
+    }
+
+  }
+</script>
+
+<body style="background-color: burlywood;">
+  <nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+      <!-- <div class="navbar-header">
+        <a class="navbar-brand" href="#">Gán nhãn biển số xe</a>
+      </div> -->
+      <ul class="nav navbar-nav">
+        <li><a href="{{url_for('home')}}">Trang chủ</a></li>
+        <li class="active"><a href="{{url_for('detect')}}">Detect</a></li>
+        <li><a href="{{url_for('orc')}}">ORC</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <button type="button" class="btn btn-danger navbar-btn" data-toggle="modal" data-target="#myModal">Hướng
+          dẫn</button>
+      </ul>
+      <!-- Modal -->
+      <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog" style="width: 800px;margin: auto;">
+
+          <!-- Modal content-->
+          <div class="modal-content" style="width: 800px;margin: auto;">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title">Hướng dẫn sử dụng công cụ gán nhãn biển số xe </h4>
+            </div>
+            <div class="modal-body">
+              <div style=" text-align: center;" >
+                <video width="640" height="360" controls>
+                  <source src="{{url_for('static',filename = 'img_HD/video1.mp4')}}" type="video/mp4">
+                  <source src="{{url_for('static',filename = 'img_HD/video1.ogg')}}" type="video/ogg">
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+              <p>
+                Bước 1: Xác định phương tiện trong hình thuộc loại xe nào sau đó chọn loại xe tương ứng.
+              </p>
+              <div style=" text-align: center;">
+                <img src="{{url_for('static',filename = 'img_HD/1.png')}}">
+              </div>
+              <p>
+                Bước 2: Xác định xem trong hình có biển số hay không ?<br>
+                - Nếu có: Xác định vị trí biển số bằng cách click chuột vào 4 điểm bao quanh biển số theo
+                thứ điểm trên cùng bên trái -> trên cùng bên phải -> dưới cùng bên trái -> dưới cùng bên
+                phải .
+              </p>
+              <div style=" text-align: center;">
+                <img src="{{url_for('static',filename = 'img_HD/2.png')}}">
+              </div>
+              <p>
+                - Nếu trong hình không có biển số thì tích vào ô “Không”.<br>
+
+              </p>
+              <div style=" text-align: center;">
+                <img src="{{url_for('static',filename = 'img_HD/3.png')}}">
+              </div>
+              <p>
+                Bước 3: Lập lại 2 bước trên với mỗi hình ở trong danh sách. Khi hoàn thành hình cuối cùng
+                thì nhấn chuyển tới trang tiếp theo để tiếp tục. Lúc nhấn chuyển trang dữ liệu sẽ được tự động lưu lại.
+              </p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class="container" style="width: 100%;">
+    {%for img in imgs%}
+    <div class="row" style="border: groove;width: 95%;margin: auto;">
+      <div class="col-md-8"
+        style="  display: flex;justify-content: center;align-items: center;background-color:black; width: 70%;height: 500px;overflow: auto;">
+        <canvas id="canvas{{img[0]}}" style="border:1px solid #000000;width: auto;height: auto; margin: auto;"></canvas>
+      </div>
+      <div class="col-md-4" style="background-color: cadetblue;width: 30%;height: 500px;margin: auto;">
+        <div class="form-horizontal" style="font-size: 14px;font-weight: 600;margin: auto;padding-top: 50px;">
+          <div class="form-group">
+            <p class="control-label col-sm-3">ID:</label>
+            <div class="col-sm-8">
+              <input type="text" readonly class="form-control" id="id{{img[0]}}" value="{{img[0]}}">
+            </div>
+          </div>
+          <div class="form-group">
+            <p class="control-label col-sm-3">Ảnh:</p>
+            <div class="col-sm-8">
+              <input type="text" readonly class="form-control" id="path{{img[0]}}" value="{{img[2]}}">
+            </div>
+          </div>
+          <div class="form-group">
+            <p class="control-label col-sm-3">Loại xe</p>
+            <div class="col-sm-8">
+              <select id="type{{img[0]}}" class="form-control">
+                {% if img[1] == 'oto' %}
+                <option selected="selected" value="oto">Ô tô</option>
+                {% else %}
+                <option value="oto">Ô tô</option>
+                {% endif %}
+                {% if img[1] == 'moto' %}
+                <option selected="selected" value="moto">Xe máy</option>
+                {% else %}
+                <option value="moto">Xe máy</option>
+                {% endif %}
+                <option value="other">Loại khác</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <p class="control-label col-sm-3">Các điểm</p>
+            <div class="col-sm-8">
+              <textarea class="form-control" rows="4" id="list_point{{img[0]}}"></textarea>
+            </div>
+
+          </div>
+          <div class="form-group">
+            <p class="col-sm-3 control-label">Trạng thái</p>
+            <div class="col-sm-8">
+              <input readonly type="text" class="form-control" value="{{img[11]}}"><br>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+              <div class="checkbox">
+                <label> {% if img[11] != 'null' %}
+                  <input id="checkbox{{img[0]}}" type="checkbox" checked onclick="update_checkbox('{{img[0]}}')">
+                  {% else %}
+                  <input id="checkbox{{img[0]}}" type="checkbox" onclick="update_checkbox('{{img[0]}}')">
+                  {% endif %} Có </label>
+                <label> {% if img[11] == 'null' %}
+                  <input id="checkboxF{{img[0]}}" type="checkbox" checked onclick="update_checkboxF('{{img[0]}}')">
+                  {% else %}
+                  <input id="checkboxF{{img[0]}}" type="checkbox" onclick="update_checkboxF('{{img[0]}}')">
+                  {% endif %} Không biển số </label>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <button id="clear{{i}}" class="btn btn-primary mb-2" onclick="clearCanvas('{{img[0]}}')">Clear</button>
+      </div>
+    </div>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script>
+      points['{{ img[0] }}'] = new Array();
+      images['{{ img[0] }}'] = new Image();
+      detects['{{ img[0] }}'] = new Array();
+      detects['{{ img[0] }}'][0] = '{{img[0]}}';
+      detects['{{ img[0] }}'][1] = '{{img[1]}}';
+      detects['{{ img[0] }}'][2] = '{{img[2]}}';
+      detects['{{ img[0] }}'][11] = '{{img[11]}}';
+      if ('{{img[11]}}' == 'completed') {
+        points['{{ img[0] }}'][0] = '{{img[3]}}';
+        points['{{ img[0] }}'][1] = '{{img[4]}}';
+        points['{{ img[0] }}'][2] = '{{img[5]}}';
+        points['{{ img[0] }}'][3] = '{{img[6]}}';
+        points['{{ img[0] }}'][4] = '{{img[7]}}';
+        points['{{ img[0] }}'][5] = '{{img[8]}}';
+        points['{{ img[0] }}'][6] = '{{img[9]}}';
+        points['{{ img[0] }}'][7] = '{{img[10]}}';
+      }
+
+      images['{{ img[0] }}'].src = "{{url_for('static',filename = img[2])}}";
+      canvass['{{ img[0] }}'] = document.getElementById('canvas{{img[0]}}');
+
+      contexts['{{ img[0] }}'] = canvass['{{ img[0] }}'].getContext('2d');
+      images['{{ img[0] }}'].onload = function () {
+        images['{{ img[0] }}'].style.display = 'none'; // I don't know why they hide it
+        canvass['{{ img[0] }}'].height = images['{{ img[0] }}'].height;
+        canvass['{{ img[0] }}'].width = images['{{ img[0] }}'].width;
+        contexts['{{ img[0] }}'].drawImage(images['{{ img[0]}}'], 0, 0);
+        refresh('{{ img[0] }}');
+      };
+      canvass['{{ img[0] }}'].addEventListener('click', function (evt) {
+        var mousePos = getMousePos(canvass['{{ img[0] }}'], evt);
+        if (points['{{ img[0] }}'].length == 0) {
+          document.getElementById("checkbox{{ img[0] }}").checked = true;
+          document.getElementById("checkboxF{{ img[0] }}").checked = false;
+          points['{{ img[0] }}'].push(mousePos.x);
+          points['{{ img[0] }}'].push(mousePos.y);
+          refresh('{{ img[0] }}');
+          return;
+        }
+        if (points['{{ img[0] }}'].length >= 2 && points['{{ img[0] }}'].length < 8) {
+          points['{{ img[0] }}'].push(mousePos.x);
+          points['{{ img[0] }}'].push(mousePos.y);
+          refresh('{{ img[0] }}');
+          return;
+        }
+        if (points['{{ img[0] }}'].length == 8) {
+          return;
+          refresh('{{ img[0] }}');
+
+        }
+      }, false);
+      canvass['{{ img[0] }}'].addEventListener('mousemove', function (evt) {
+        var mousePos = getMousePos(canvass['{{ img[0] }}'], evt);
+        if (points['{{ img[0] }}'].length >= 2 && points['{{ img[0] }}'].length < 8) {
+          refresh('{{ img[0] }}');
+          drawLine(points['{{ img[0] }}'][points['{{ img[0] }}'].length - 2], points['{{ img[0] }}'][points['{{ img[0] }}'].length - 1], mousePos.x, mousePos.y, contexts['{{ img[0] }}']);
+        }
+
+      }, false)
+
+    </script>
+    {%endfor%}
+    <div style="height: 100px;text-align: center;">
+      <button class="btn btn-primary mb-2" onclick="saveAll('first')">Trang đầu</button>
+      <button class="btn btn-primary mb-2" onclick="saveAll('previous')">Trang trước</button>
+      <label style="border: groove;text-align: center;">{{cur_page}}</label>
+      <button class="btn btn-primary mb-2" onclick="saveAll('next')">Trang sau</button>
+      <button class="btn btn-primary mb-2" onclick="saveAll('last')">Trang cuối</button>
+
+    </div>
+    <button class="btn btn-primary mb-2" onclick="saveAll('')">Lưu</button>
+  </div>
+</body>
+<footer style="height: 100px; background-color: burlywood;">
+
+</footer>
+<script>
+  var last_index;
+  var kt_anh_raw = 0;
+  function saveAll(then) {
+    console.log(JSON.stringify(points));
+    kt_anh_raw = 0;
+    detects.forEach(item => {
+      //gan cac dinh cua lable
+      if (points[item[0]].length >= 8) {
+        for (let index = 3; index <= 10; index++) {
+          item[index] = points[item[0]][index - 3];
+        }
+        item[11] = 'completed';
+      } else {
+        if (document.getElementById('checkbox' + item[0]).checked == true) {
+          //kiem tra va gan trang thai
+          item[11] = 'raw';
+          kt_anh_raw = kt_anh_raw + 1;
+        } else {
+          item[11] = 'null';
+        }
+      }
+      // gan lai loai xe
+      var select = document.getElementById('type' + item[0]);
+      var value_type = select.options[select.selectedIndex].value;
+      //console.log(value);
+      if (value_type == 'oto') {
+        item[1] = 'oto';
+      } else if (value_type == 'moto') {
+        item[1] = 'moto';
+      } else {
+        item[1] = 'other';
+      }
+
+      last_index = item[0];
+    })
+    if (kt_anh_raw > 0) {
+      alert('còn ' + kt_anh_raw + ' ảnh chưa gán nhãn!');
+      return;
+    }
+
+    const filteredDetects = detects.filter(item => item !== null)
+    var cur_page;
+    if (parseInt('{{cur_page}}') > 0) {
+      cur_page = parseInt('{{cur_page}}');
+
+    } else {
+      cur_page = 1;
+    }
+    json_data = { detects: filteredDetects, first_id: last_index }
+    $.post("{{url_for('detect')}}" + '{{cur_page}}',
+      {
+        data: JSON.stringify(json_data),
+      });
+    //alert("Đã lưu!");
+    if (then == 'next') {
+      if (cur_page == Math.floor(parseInt('{{max_lenght}}') / 5) + 1) {
+        alert("Bạn đang ở trang cuối cùng")
+      } else {
+        cur_page += 1;
+        document.location.href = "{{url_for('detect')}}" + cur_page.toString();
+      }
+
+    } else if (then == 'previous') {
+      if (cur_page == 1) {
+        alert("Bạn đang ở trang đầu tiên");
+      } else {
+        cur_page -= 1;
+        document.location.href = "{{url_for('detect')}}" + cur_page.toString();
+      }
+    } else if (then == 'last') {
+      cur_page = Math.floor(parseInt('{{max_lenght}}') / 5) + 1;
+      document.location.href = "{{url_for('detect')}}" + cur_page.toString();
+    } else if (then == 'first') {
+      document.location.href = "{{url_for('detect')}}";
+    }
+    else {
+
+      alert("Lưu thành công!");
+    }
+  }
+</script>

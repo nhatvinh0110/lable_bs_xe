@@ -1,0 +1,8 @@
+,vehicle_path,vehicle_type,has_lp,lp_path,p1_x,p1_y,p2_x,p2_y,p3_x,p3_y,p4_x,p4_y,line1_numbers,line2_numbers
+0,../dataset/29_12_data/car/n_2_1640741447.jpg,car,no,,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,
+1,../dataset/29_12_data/car/p_0_1640741446.jpg,car,yes,../dataset/29_12_data/car_lp/p_0_1640741446.jpg,141.0,653.0,263.0,649.0,263.0,677.0,142.0,683.0,30Z-9405,
+2,../dataset/29_12_data/car/p_1_1640741447.jpg,car,yes,../dataset/29_12_data/car_lp/p_1_1640741447.jpg,193.0,328.0,284.0,324.0,284.0,347.0,193.0,349.0,51D-202.44,
+3,../dataset/29_12_data/car/p_3_1640741448.jpg,car,yes,../dataset/29_12_data/car_lp/p_3_1640741448.jpg,270.0,505.0,376.0,502.0,378.0,527.0,271.0,529.0,29B-115.34,
+4,../dataset/29_12_data/car/p_4_1640741450.jpg,car,yes,../dataset/29_12_data/car_lp/p_4_1640741450.jpg,216.0,249.0,273.0,248.0,274.0,289.0,216.0,290.0,29C,664.86
+5,../dataset/29_12_data/car/p_5_1640741451.jpg,car,yes,../dataset/29_12_data/car_lp/p_5_1640741451.jpg,157.0,192.0,242.0,192.0,243.0,212.0,156.0,212.0,30E-401.00,
+6,../dataset/29_12_data/car/p_6_1640741453.jpg,car,yes,../dataset/29_12_data/car_lp/p_6_1640741453.jpg,202.0,366.0,303.0,363.0,303.0,386.0,202.0,389.0,29H-464.48,
