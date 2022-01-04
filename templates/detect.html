@@ -122,9 +122,6 @@
 <body style="background-color: burlywood;">
   <nav class="navbar navbar-inverse">
     <div class="container-fluid">
-      <!-- <div class="navbar-header">
-        <a class="navbar-brand" href="#">Gán nhãn biển số xe</a>
-      </div> -->
       <ul class="nav navbar-nav">
         <li><a href="{{url_for('home')}}">Trang chủ</a></li>
         <li class="active"><a href="{{url_for('detect')}}">Detect</a></li>
@@ -145,7 +142,7 @@
               <h4 class="modal-title">Hướng dẫn sử dụng công cụ gán nhãn biển số xe </h4>
             </div>
             <div class="modal-body">
-              <div style=" text-align: center;" >
+              <div style=" text-align: center;">
                 <video width="640" height="360" controls>
                   <source src="{{url_for('static',filename = 'img_HD/video1.mp4')}}" type="video/mp4">
                   <source src="{{url_for('static',filename = 'img_HD/video1.ogg')}}" type="video/ogg">
@@ -176,7 +173,8 @@
               </div>
               <p>
                 Bước 3: Lập lại 2 bước trên với mỗi hình ở trong danh sách. Khi hoàn thành hình cuối cùng
-                thì nhấn chuyển tới trang tiếp theo để tiếp tục. Lúc nhấn chuyển trang dữ liệu sẽ được tự động lưu lại.
+                thì nhấn chuyển tới trang tiếp theo để tiếp tục. Lúc nhấn chuyển trang dữ liệu sẽ được
+                tự động lưu lại.
               </p>
             </div>
             <div class="modal-footer">
@@ -416,7 +414,6 @@
       document.location.href = "{{url_for('detect')}}";
     }
     else {
-
       alert("Lưu thành công!");
     }
   }

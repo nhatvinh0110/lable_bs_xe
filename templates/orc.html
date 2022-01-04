@@ -2,22 +2,59 @@
 <html lang="en">
 
 <head>
-  <title>Home</title>
+  <title>ORC</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </head>
+<script>
+  var images = [];
+  var canvass = [];
+  var contexts = [];
+  var plate_number = new Array();
+  var points = new Array();
+  var ORC = new Array();
+  function fillColor(color, context) {
+    context.fillStyle = color;
+    context.strokeStyle = color;
+    currentColor = color;
+  }
+  function refresh(id) {
+    var context = contexts[id];
+    var canvas = canvass[id];
+    var l = lines[id];
+    //in ra bien so xe
+    document.getElementById("list_plate" + id).innerHTML = "";
+    for (var index = 0; index < l.length; index += 2) {
+      document.getElementById("list_plate" + id).innerHTML += " (" + l[index] + ";" + l[index + 1] + ")\n";
+    }
 
-<body>
+    //clear canvas
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(images[id], 0, 0);
+  }
+  function update_status(id) {
+    var radio_button0 = document.getElementById("button0" + id);
+    var radio_button1 = document.getElementById("button1" + id);
+    var radio_button2 = document.getElementByID("button2" + id);
+    if (!radio_button1.checked) {
+      document.getElementById("list_plate" + id).innerHTML = "";
+      l[id].length = 0;
+      refresh(id);
+      images[id][4] = null;
+      images[id][5] = null;
+    }
+  }
+</script>
 
+<body style="background-color: burlywood;">
   <nav class="navbar navbar-inverse">
     <div class="container-fluid">
-      </div> -->
       <ul class="nav navbar-nav">
-        <li  ><a href="{{url_for('home')}}">Trang chủ</a></li> 
-        <li ><a href="{{url_for('detect')}}">Detect</a></li>
+        <li><a href="{{url_for('home')}}">Trang chủ</a></li>
+        <li><a href="{{url_for('detect')}}">Detect</a></li>
         <li class="active"><a href="{{url_for('orc')}}">ORC</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -26,29 +63,323 @@
       </ul>
       <!-- Modal -->
       <div class="modal fade" id="myModal" role="dialog">
-        <div class="modal-dialog">
+        <div class="modal-dialog" style="width: 800px;margin: auto;">
 
           <!-- Modal content-->
-          <div class="modal-content">
-            <div class="modal-header">
+          <div class=" modal-content" style="width: 800px;margin: auto;">
+            <div class=" modal-header">
               <button type="button" class="close" data-dismiss="modal">&times;</button>
               <h4 class="modal-title">Hướng dẫn sử dụng công cụ gán nhãn biển số xe </h4>
             </div>
             <div class="modal-body">
-              
+              <div style=" text-align: center;">
+                <video width="640" height="360" controls>
+                  <source src="{{url_for('static',filename = 'img_HD/video2.mp4')}}" type="video/mp4">
+                </video>
+              </div>
+              <p>
+                Bước 1: Chọn loại biển số (1 dòng hay 2 dòng) hoặc chọn biển số không xác định (do ảnh không rõ, thiếu
+                chữ/số, không có hình ảnh biển số,...)
+              </p>
+              <div style=" text-align: center;">
+                <img src="{{url_for('static',filename = 'img_HD/4.png')}}">
+              </div>
+              <p>
+                !!!CHÚ Ý: Những trường hợp chọn không xác định:
+                1. Ảnh không có biển số
+              </p>
+              <div style=" text-align: center;">
+                <img src="{{url_for('static',filename = 'img_HD/5.png')}}">
+              </div>
+              <p>
+                2. Ảnh biển số mất chữ/số:
+              </p>
+              <div style=" text-align: center;">
+                <img src="{{url_for('static',filename = 'img_HD/6.png')}}">
+              </div>
+              <p>
+                3. Ảnh biển số bị che (hoặc mờ):
+              </p>
+              <div style=" text-align: center;">
+                <img src="{{url_for('static',filename = 'img_HD/7.png')}}">
+              </div>
+              <p>
+                Bước 2: Lập lại 2 bước trên với mỗi hình ở trong danh sách. Khi hoàn thành hình cuối cùng
+                thì nhấn chuyển tới trang tiếp theo để tiếp tục. Lúc nhấn chuyển trang dữ liệu sẽ được
+                tự động lưu lại.
+              </p>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              </div>
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+          </div>
+        </div>
+      </div>
+  </nav>
+  <div class="container">
+    {%for img in imgs%}
+    <div class="row" style="border: groove;">
+      <div class="col-sm-8"
+        style="  display: flex;justify-content: center;align-items: center;background-color:#4a4e69;height: 396px;overflow: auto;">
+        <img src="{{url_for('static',filename = 'lps/'+img[1]+'/'+ img[2])}}">
+
+      </div>
+      <div class="col-sm-4" style="background-color: #9a8c98;">
+        <div class="form-horizontal" style="font-size: 14px;font-weight: 600;margin: auto;">
+          <div class="form-group">
+            <p class="control-label col-sm-3">STT: </p>
+            <div class="col-sm-8">
+              <input type="text" readonly class="form-control" id="id{{img[0]}}" value="{{img[0]}}">
             </div>
           </div>
-
+          <div class="form-group">
+            <p class="control-label col-sm-3">Tên file:</p>
+            <div class="col-sm-8">
+              <input type="text" readonly class="form-control" id="path{{img[0]}}" value="{{img[2]}}">
+            </div>
+          </div>
+          <div class="form-group">
+            <p class="control-label col-sm-3">Loại xe: </p>
+            <div class="col-sm-8">
+              {% if img[1] == 'car' %}
+              <input type="text" readonly class="form-control" id="path{{img[0]}}" value="Ô tô">
+              {% else %}
+              <input type="text" readonly class="form-control" id="path{{img[0]}}" value="Xe máy">
+              {% endif %}
+            </div>
+          </div>
+          <div class="form-group">
+            <p class="control-label col-sm-3">Số dòng:</p>
+            <div class="col-sm-8">
+              <div class="radio">
+                <div>
+                  {% if img[3] == 1 %}
+                  <div class="col-sm-8">
+                    <input id="button0{{img[0]}}" type="radio" name="plate_line{{img[0]}}"
+                      onclick="update_status('{{img[0]}}')">
+                    <label for="button0{{img[0]}}">Không xác định</label>
+                  </div>
+                  <div class="col-sm-8">
+                    <input id="button1{{img[0]}}" type="radio" name="plate_line{{img[0]}}"
+                      onclick="update_status('{{img[0]}}')" checked>
+                    <label for="button1{{img[0]}}"> 1 dòng</label>
+                  </div>
+                  <div class="col-sm-8">
+                    <input id="button2{{img[0]}}" type="radio" name="plate_line{{img[0]}}"
+                      onclick="update_status('{{img[0]}}')">
+                    <label for="button2{{img[0]}}"> 2 dòng</label>
+                  </div>
+                  {% elif img[3] == 2 %}
+                  <div class="col-sm-8">
+                    <input id="button0{{img[0]}}" type="radio" name="plate_line{{img[0]}}"
+                      onclick="update_status('{{img[0]}}')">
+                    <label for="button0{{img[0]}}">Không xác định</label>
+                  </div>
+                  <div class="col-sm-8">
+                    <input id="button1{{img[0]}}" type="radio" name="plate_line{{img[0]}}"
+                      onclick="update_status('{{img[0]}}')">
+                    <label for="button1{{img[0]}}"> 1 dòng</label>
+                  </div>
+                  <div class="col-sm-8">
+                    <input id="button2{{img[0]}}" type="radio" name="plate_line{{img[0]}}"
+                      onclick="update_status('{{img[0]}}')" checked>
+                    <label for="button2{{img[0]}}"> 2 dòng</label>
+                  </div>
+                  {% else %}
+                  <div class="col-sm-8">
+                    <input id="button0{{img[0]}}" type="radio" name="plate_line{{img[0]}}"
+                      onclick="update_status('{{img[0]}}')" checked>
+                    <label for="button0{{img[0]}}">Không xác định</label>
+                  </div>
+                  <div class="col-sm-8">
+                    <input id="button1{{img[0]}}" type="radio" name="plate_line{{img[0]}}"
+                      onclick="update_status('{{img[0]}}')">
+                    <label for="button1{{img[0]}}"> 1 dòng</label>
+                  </div>
+                  <div class="col-sm-8">
+                    <input id="button2{{img[0]}}" type="radio" name="plate_line{{img[0]}}"
+                      onclick="update_status('{{img[0]}}')">
+                    <label for="button2{{img[0]}}"> 2 dòng</label>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <p class="control-label col-sm-3">Dòng 1: </p>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" rows="1" id="list_plate{{img[0]}}" value="{{img[4]}}">
+            </div>
+          </div>
+          <div class="form-group">
+            <p class="control-label col-sm-3">Dòng 2: </p>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" rows="1" id="list_plate2{{img[0]}}" value="{{img[5]}}">
+            </div>
+          </div>
+          <div class="form-group">
+            <p class="col-sm-3 control-label">Trạng thái: </p>
+            <div class="col-sm-8">
+              {% if img[6] == "completed" %}
+              <input readonly type="text" class="form-control" value="Đã xong"><br>
+              {% elif img[6] == "raw" %}
+              <input readonly type="text" class="form-control" value="Chưa xong"><br>
+              {% else %}
+              <input readonly type="text" class="form-control" value="Không có biển số"><br>
+              {% endif %}
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </nav>
-  <div class="container">
-      Trang Orc của dũng
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script>
+      plate_number['{{ img[0] }}'] = new Array();
+      images['{{ img[0] }}'] = new Image();
+      ORC['{{ img[0] }}'] = new Array();
+      ORC['{{ img[0] }}'][0] = '{{img[0]}}';
+      ORC['{{ img[0] }}'][1] = '{{img[1]}}';
+      ORC['{{ img[0] }}'][2] = '{{img[2]}}';
+      ORC['{{ img[0] }}'][3] = '{{img[3]}}';
+      ORC['{{ img[0] }}'][6] = '{{img[6]}}';
+      if ('{{img[6]}}' == true) {
+        if ('{{img[3]}}' == 1) {
+          plate_number['{{ img[0] }}'][0] = '{{img[4]}}';
+        }
+        else {
+          plate_number['{{ img[0] }}'][0] = '{{img[4]}}';
+          plate_number['{{ img[0] }}'][1] = '{{img[5]}}';
+        }
+      }
+      if ('{{img[1]}}' == 'oto') {
+        images['{{ img[0] }}'].src = "{{url_for('static',filename = 'lps/car/'+ img[2])}}";
+      } else {
+        images['{{ img[0] }}'].src = "{{url_for('static',filename = 'lps/moto/'+ img[2])}}";
+      }
+    // canvass['{{ img[0] }}'] = document.getElementById('canvas{{img[0]}}');
+
+    // contexts['{{ img[0] }}'] = canvass['{{ img[0] }}'].getContext('2d');
+    // images['{{ img[0] }}'].onload = function () {
+    //   images['{{ img[0] }}'].style.display = 'none';
+    //   canvass['{{ img[0] }}'].height = images['{{ img[0] }}'].height;
+    //   canvass['{{ img[0] }}'].width = images['{{ img[0] }}'].width;
+    //   contexts['{{ img[0] }}'].drawImage(images['{{ img[0]}}'], 0, 0);
+    //   refresh('{{ img[0] }}');
+    // };
+    </script>
+    {%endfor%}
+    <div style="height: 100px;text-align: center;">
+      <button class="btn btn-primary mb-2" onclick="saveAll('first')">Trang đầu</button>
+      <button class="btn btn-primary mb-2" onclick="saveAll('previous')">Trang trước</button>
+      <label style="border: groove;text-align: center;">{{cur_page}}</label>
+      <button class="btn btn-primary mb-2" onclick="saveAll('next')">Trang sau</button>
+      <button class="btn btn-primary mb-2" onclick="saveAll('last')">Trang cuối</button>
+    </div>
   </div>
 </body>
 
 </html>
+<footer>
+</footer>
+
+<script>
+  function saveAll(then) {
+    var numb = 0;
+    var last_index;
+    ORC.forEach(item => {
+      last_index = item[0];
+      item[4] = document.getElementById('list_plate' + item[0]).value;
+      item[5] = document.getElementById('list_plate2' + item[0]).value;
+
+      //cập nhật trạng thái
+      if (document.getElementById('button1' + item[0]).checked == true) {
+        item[3] = '1';
+        if (item[4] != 'null') {
+          item[5] = 'null'
+          item[6] = 'completed';
+        } else {
+          numb += 1;
+          //alert("Ảnh số " + item[0] + " chưa hoàn thành !");
+        }
+
+      }
+      if (document.getElementById('button2' + item[0]).checked == true) {
+        item[3] = '2';
+        if (item[4] != 'null' && item[5] != 'null') {
+          item[6] = 'completed';
+        } else {
+          numb += 1;
+          //alert("Ảnh số " + item[0] + " chưa hoàn thành !");
+        }
+      }
+      if (document.getElementById('button0' + item[0]).checked == true) {
+        item[3] = 'null';
+        item[4] = 'null';
+        item[5] = 'null';
+        item[6] = 'null';
+      }
+
+      // if (points[item[0]].length >= 8) {
+      //   for (let index = 3; index <= 10; index++) {
+      //     item[index] = points[item[0]][index - 3];
+      //   }
+      //   item[6] = 'completed';
+      // } else {
+      //   if (document.getElementById('button1' + item[0]).checked == true) {
+      //     item[6] = 'raw'
+      //   } else {
+      //     item[6] = 'null';
+      //   }
+      // }
+      // last_index = item[0];
+      // console.log(last_index);
+    });
+    if (numb > 0) {
+      alert('Còn ' + numb + ' ảnh chưa xong');
+      return;
+    }
+    const filteredORC = ORC.filter(item => item !== null)
+
+    var cur_page = 1;
+    if (parseInt('{{cur_page}}') > 0) {
+      cur_page = parseInt('{{cur_page}}');
+
+    } else {
+      cur_page = 1;
+    }
+    json_data = { ORC: filteredORC, first_id: last_index }
+    $.post("{{url_for('orc')}}" + '{{cur_page}}',
+      {
+        data: JSON.stringify(json_data),
+      });
+    //alert("Đã lưu!");
+    if (then == 'next') {
+      if (cur_page == Math.floor(parseInt('{{max_lenght}}') / 10) + 1) {
+        alert("Bạn đang ở trang cuối cùng")
+      } else {
+        cur_page += 1;
+        document.location.href = "{{url_for('orc')}}" + cur_page.toString();
+      }
+
+    } else if (then == 'previous') {
+      if (cur_page == 1) {
+        alert("Bạn đang ở trang đầu tiên")
+      } else {
+        cur_page -= 1;
+        document.location.href = "{{url_for('orc')}}" + cur_page.toString();
+      }
+    } else if (then == 'last') {
+      cur_page = Math.floor(parseInt('{{max_lenght}}') / 10) + 1;
+      document.location.href = "{{url_for('orc')}}" + cur_page.toString();
+    }
+    else if (then == 'first') {
+      document.location.href = "{{url_for('orc')}}";
+
+    }
+    else {
+      alert("Lưu thành công!");
+    }
+  }
+</script>
