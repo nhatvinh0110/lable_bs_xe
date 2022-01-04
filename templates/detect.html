@@ -122,6 +122,9 @@
 <body style="background-color: burlywood;">
   <nav class="navbar navbar-inverse">
     <div class="container-fluid">
+      <!-- <div class="navbar-header">
+        <a class="navbar-brand" href="#">Gán nhãn biển số xe</a>
+      </div> -->
       <ul class="nav navbar-nav">
         <li><a href="{{url_for('home')}}">Trang chủ</a></li>
         <li class="active"><a href="{{url_for('detect')}}">Detect</a></li>
@@ -142,7 +145,7 @@
               <h4 class="modal-title">Hướng dẫn sử dụng công cụ gán nhãn biển số xe </h4>
             </div>
             <div class="modal-body">
-              <div style=" text-align: center;">
+              <div style=" text-align: center;" >
                 <video width="640" height="360" controls>
                   <source src="{{url_for('static',filename = 'img_HD/video1.mp4')}}" type="video/mp4">
                   <source src="{{url_for('static',filename = 'img_HD/video1.ogg')}}" type="video/ogg">
@@ -173,8 +176,7 @@
               </div>
               <p>
                 Bước 3: Lập lại 2 bước trên với mỗi hình ở trong danh sách. Khi hoàn thành hình cuối cùng
-                thì nhấn chuyển tới trang tiếp theo để tiếp tục. Lúc nhấn chuyển trang dữ liệu sẽ được
-                tự động lưu lại.
+                thì nhấn chuyển tới trang tiếp theo để tiếp tục. Lúc nhấn chuyển trang dữ liệu sẽ được tự động lưu lại.
               </p>
             </div>
             <div class="modal-footer">
@@ -277,6 +279,15 @@
         points['{{ img[0] }}'][5] = '{{img[8]}}';
         points['{{ img[0] }}'][6] = '{{img[9]}}';
         points['{{ img[0] }}'][7] = '{{img[10]}}';
+      }else if('{{img[11]}}' == 'raw' && '{{img[3]}}' != ''){
+        points['{{ img[0] }}'][0] = '{{img[3]}}';
+        points['{{ img[0] }}'][1] = '{{img[4]}}';
+        points['{{ img[0] }}'][2] = '{{img[5]}}';
+        points['{{ img[0] }}'][3] = '{{img[6]}}';
+        points['{{ img[0] }}'][4] = '{{img[7]}}';
+        points['{{ img[0] }}'][5] = '{{img[8]}}';
+        points['{{ img[0] }}'][6] = '{{img[9]}}';
+        points['{{ img[0] }}'][7] = '{{img[10]}}';
       }
 
       images['{{ img[0] }}'].src = "{{url_for('static',filename = img[2])}}";
@@ -347,9 +358,14 @@
       //gan cac dinh cua lable
       if (points[item[0]].length >= 8) {
         for (let index = 3; index <= 10; index++) {
+          if(points[item[0]][index - 3] == '' || points[item[0]][index - 3] == null){
+            item[11] = 'raw';
+            break;
+          }
           item[index] = points[item[0]][index - 3];
+          item[11] = 'completed';
         }
-        item[11] = 'completed';
+        
       } else {
         if (document.getElementById('checkbox' + item[0]).checked == true) {
           //kiem tra va gan trang thai
@@ -414,6 +430,7 @@
       document.location.href = "{{url_for('detect')}}";
     }
     else {
+
       alert("Lưu thành công!");
     }
   }
