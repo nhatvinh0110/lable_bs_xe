@@ -16,7 +16,6 @@ def create_connection(db_file):
         print(e)
     return conn
 
-
 def create_detect(conn, Detect):
     sql = ''' INSERT INTO Detect(LoaiXe,Path,x1,y1,x2,y2,x3,y3,x4,y4,TrangThai)
               VALUES(?,?,?,?,?,?,?,?,?,?,?) '''
@@ -38,8 +37,6 @@ def select_detects(conn):
     cur.execute("SELECT * FROM Detect")
     Detects = cur.fetchall()
     return Detects
-
-
 def init_data_from_csv(csv_path) :
     database = "./database.db"
     current_csv = pd.read_csv(csv_path)
@@ -53,8 +50,8 @@ def init_data_from_csv(csv_path) :
             if(item[3] == 'no'):
                 break
             new_ORC = (item[2],item[4][3:],'2',item[13],item[14],'raw',new_Detect_id)
-            if(item[14]==''):
-                if(item[13] == ''):
+            if(pd.isnull(item[14])):
+                if(pd.isnull(item[13])):
                     new_ORC = (item[2],item[4][3:],'0',item[13],item[14],'raw',new_Detect_id)
                 else:
                     new_ORC = (item[2],item[4][3:],'1',item[13],item[14],'raw',new_Detect_id)
