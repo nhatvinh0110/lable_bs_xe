@@ -60,5 +60,7 @@ def init_data_from_csv(csv_path) :
 if __name__ == '__main__':
     
     for x in os.listdir("./static/dataset/"):
-        init_data_from_csv("./static/dataset/"+x+"/car.csv")
+        for csv in os.listdir("./static/dataset/"+x+"/"):
+            if csv.endswith(".csv"):
+                init_data_from_csv("./static/dataset/"+x+"/"+csv)
             
