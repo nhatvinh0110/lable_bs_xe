@@ -146,11 +146,11 @@
             </div>
             <div class="modal-body">
               <div style=" text-align: center;" >
-                <video width="640" height="360" controls>
+                <!-- <video width="640" height="360" controls>
                   <source src="{{url_for('static',filename = 'img_HD/video1.mp4')}}" type="video/mp4">
                   <source src="{{url_for('static',filename = 'img_HD/video1.ogg')}}" type="video/ogg">
                   Your browser does not support the video tag.
-                </video>
+                </video> -->
               </div>
               <p>
                 Bước 1: Xác định phương tiện trong hình thuộc loại xe nào sau đó chọn loại xe tương ứng.
@@ -290,7 +290,7 @@
         points['{{ img[0] }}'][7] = '{{img[10]}}';
       }
 
-      images['{{ img[0] }}'].src = "{{url_for('static',filename = img[2])}}";
+      images['{{ img[0] }}'].src = "https://drive.google.com/uc?id="+'{{img[12]}}';
       canvass['{{ img[0] }}'] = document.getElementById('canvas{{img[0]}}');
 
       contexts['{{ img[0] }}'] = canvass['{{ img[0] }}'].getContext('2d');
@@ -334,15 +334,15 @@
 
     </script>
     {%endfor%}
-    <div style="height: 100px;text-align: center;">
+    <div class="clearfix" style="height: 100px;text-align: center;">
+
       <button class="btn btn-primary mb-2" onclick="saveAll('first')">Trang đầu</button>
       <button class="btn btn-primary mb-2" onclick="saveAll('previous')">Trang trước</button>
       <label style="border: groove;text-align: center;">{{cur_page}}</label>
       <button class="btn btn-primary mb-2" onclick="saveAll('next')">Trang sau</button>
       <button class="btn btn-primary mb-2" onclick="saveAll('last')">Trang cuối</button>
-
+      <button class="btn btn-danger mb-2 pull-right" onclick="saveAll('')">Lưu</button>
     </div>
-    <button class="btn btn-primary mb-2" onclick="saveAll('')">Lưu</button>
   </div>
 </body>
 <footer style="height: 100px; background-color: burlywood;">
@@ -432,6 +432,8 @@
     else {
 
       alert("Lưu thành công!");
+      saveAll('next');
+
     }
   }
 </script>

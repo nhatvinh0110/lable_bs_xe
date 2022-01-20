@@ -5,6 +5,8 @@ from sqlite3 import Error
 import pandas as pd
 import matplotlib.pyplot as plt
 import random
+import shutil
+
 
 from app import detect
 
@@ -43,24 +45,26 @@ def init_data_from_csv(csv_path) :
     con = create_connection(database)
     with con:
         for item in current_csv.values:
-            new_Detect = (item[2],item[1][3:],item[5],item[6],item[7],item[8],item[9],item[10],item[11],item[12],'raw')
-            if((item[5]+item[6]+item[7]+item[8]+item[9]+item[10]+item[11]+item[12])==0):
-                new_Detect = (item[2],item[1][3:],'','','','','','','','','raw')
+            
+            new_Detect = (item[1],item[0][3:],item[4],item[5],item[6],item[7],item[8],item[9],item[10],item[11],'raw')
+            if((item[4]+item[5]+item[6]+item[7]+item[8]+item[9]+item[10]+item[11])==0):
+                new_Detect = (item[1],item[0][3:],'','','','','','','','','raw')
             new_Detect_id = create_detect(con,new_Detect)
-            if(item[3] == 'no'):
-                break
-            new_ORC = (item[2],item[4][3:],'2',item[13],item[14],'raw',new_Detect_id)
-            if(pd.isnull(item[14])):
-                if(pd.isnull(item[13])):
-                    new_ORC = (item[2],item[4][3:],'0',item[13],item[14],'raw',new_Detect_id)
+            #shutil.copyfile('static/' + item[0][3:].strip(),'./orc/'+ str(new_Detect_id)+'.jpg')
+            if(item[2] == 'no'):
+                continue
+            new_ORC = (item[1],item[3][3:],'2',item[12],item[13],'raw',new_Detect_id)
+            if(pd.isnull(item[13])):
+                if(pd.isnull(item[12])):
+                    new_ORC = (item[1],item[3][3:],'0',item[12],item[13],'raw',new_Detect_id)
                 else:
-                    new_ORC = (item[2],item[4][3:],'1',item[13],item[14],'raw',new_Detect_id)
+                    new_ORC = (item[1],item[3][3:],'1',item[12],item[13],'raw',new_Detect_id)
             create_orc(con,new_ORC)
-            print(new_Detect)
+            print(new_Detect + new_ORC)
 if __name__ == '__main__':
-    
-    for x in os.listdir("./static/dataset/"):
-        for csv in os.listdir("./static/dataset/"+x+"/"):
-            if csv.endswith(".csv"):
-                init_data_from_csv("./static/dataset/"+x+"/"+csv)
+    init_data_from_csv("./static/dataset/combined_csv.csv")
+    # for x in os.listdir("./static/dataset/"):
+    #     for csv in os.listdir("./static/dataset/"+x+"/"):
+    #         if csv.endswith(".csv"):
+    #             init_data_from_csv("./static/dataset/"+x+"/"+csv)
             
