@@ -289,8 +289,8 @@
         points['{{ img[0] }}'][6] = '{{img[9]}}';
         points['{{ img[0] }}'][7] = '{{img[10]}}';
       }
-
-      images['{{ img[0] }}'].src = "https://drive.google.com/uc?id="+'{{img[12]}}';
+      images['{{ img[0] }}'].src = "{{url_for('static',filename = img[2])}}";
+      // images['{{ img[0] }}'].src = "https://drive.google.com/uc?id="+'{{img[12]}}';
       canvass['{{ img[0] }}'] = document.getElementById('canvas{{img[0]}}');
 
       contexts['{{ img[0] }}'] = canvass['{{ img[0] }}'].getContext('2d');
