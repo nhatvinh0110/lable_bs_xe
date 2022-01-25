@@ -22,9 +22,11 @@
     </div>
   </nav>
   <div class="container">
-
     <h3>Công cụ gán nhãn biển số xe !</h3>
-    <p>Somethings!</p>
+    <p>Xin chào {{session['name']}} </p>
+    <p>Bạn đã gán nhãn được : {{session["count_detect"]}} ảnh trong Detect</p>
+    <p>Bạn đã gán nhãn được : {{session["count_orc"]}} ảnh trong ORC</p>
+    <a href="{{url_for('logout')}}">Logout</a>
   </div>
 </body>
 
